@@ -130,7 +130,7 @@
                     reservations: function () {
                         if (!this.seats) return [];
 
-                        arr = [];
+                        let arr = [];
                         for (i = 0; i < this.seats.length; i++) {
                             if (this.seats[i].status == this.seat_status.own_reservation) arr.push(this.seats[i]);
                         }
