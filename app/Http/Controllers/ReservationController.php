@@ -11,13 +11,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Class ReservationController
+ * @package App\Http\Controllers
+ */
 class ReservationController extends Controller
 {
-    public function index () {
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index ()
+    {
         return view('index');
     }
 
-    public function getSettings ($code = null) {
+    /**
+     * @param null $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSettings ($code = null)
+    {
         $is_new_transaction_code = 0;
         if (!$transaction = $this->getTransaction($code)) {
             $transaction = Transaction::generate();
@@ -42,7 +55,12 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function getSeats ($transaction_code) {
+    /**
+     * @param $transaction_code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSeats ($transaction_code)
+    {
         $transaction = $this->getTransaction($transaction_code, true);
         $seats = Seat::all();
         foreach ($seats as $s) {
@@ -52,7 +70,12 @@ class ReservationController extends Controller
         return response()->json($seats);
     }
 
-    public function reserve (Request $request) {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reserve (Request $request)
+    {
         $transaction = $this->getTransaction($request->get('transaction_code'), true);
         $seat = Seat::findOrFail($request->get('id'));
 
@@ -72,7 +95,12 @@ class ReservationController extends Controller
     }
 
 
-    public function revoke (Request $request) {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function revoke (Request $request)
+    {
         $transaction = $this->getTransaction($request->get('transaction_code'), true);
         $seat = Seat::findOrFail($request->get('id'));
 
@@ -88,7 +116,12 @@ class ReservationController extends Controller
         return response()->json(['success' => 1, 'status' => $seat->getStatus($transaction)]);
     }
 
-    public function order (Request $request) {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function order (Request $request)
+    {
         $transaction = $this->getTransaction($request->get('transaction_code'), true);
         $order = new Order();
 
@@ -134,12 +167,23 @@ class ReservationController extends Controller
         return response()->json(['success' => 1]);
     }
 
-    private function getTransaction ($code, bool $fail = false) : ?Transaction {
+    /**
+     * @param $code
+     * @param bool $fail
+     * @return Transaction|null
+     */
+    private function getTransaction ($code, bool $fail = false) : ?Transaction
+    {
         $transaction = Transaction::where('code', $code)->doesnthave('order');
         return $fail ? $transaction->firstOrFail() : $transaction->first();
     }
 
-    private function getRemainingSeconds (Transaction $transaction) : int {
+    /**
+     * @param Transaction $transaction
+     * @return int
+     */
+    private function getRemainingSeconds (Transaction $transaction) : int
+    {
         if (!$transaction->reservations->count()) {
             return 0;
         }

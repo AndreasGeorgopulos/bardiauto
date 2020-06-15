@@ -5,6 +5,10 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class Seat
+ * @package App
+ */
 class Seat extends Model
 {
     use SoftDeletes;
@@ -14,11 +18,20 @@ class Seat extends Model
     const STATUS_RESERVED = 2;
     const STATUS_ORDERED = 3;
 
-    public function reservations () {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function reservations ()
+    {
         return $this->hasMany('App\Reservation');
     }
 
-    public function getStatus (Transaction $transaction): int {
+    /**
+     * @param Transaction $transaction
+     * @return int
+     */
+    public function getStatus (Transaction $transaction): int
+    {
         if (!$reservation = $this->reservations()->first()) {
             $status = self::STATUS_FREE;
         }
